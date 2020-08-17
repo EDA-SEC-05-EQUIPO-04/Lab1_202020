@@ -85,9 +85,11 @@ def countElementsFilteredByColumn(criteria, column, lst):
         list
             Lista en la cual se realizará el conteo, debe estar inicializada
     Return:
-        counter :: int
-            la cantidad de veces ue aparece un elemento con el criterio definido
+        retdict :: dict
+            counter: la cantidad de veces que aparece un elemento con el criterio definido
+            ids: los id de dichas apariciones
     """
+    ids = []
     if len(lst)==0:
         print("La lista esta vacía")  
         return 0
@@ -95,17 +97,39 @@ def countElementsFilteredByColumn(criteria, column, lst):
         t1_start = process_time() #tiempo inicial
         counter=0 #Cantidad de repeticiones
         for element in lst:
+            
             if criteria.lower() in element[column].lower(): #filtrar por palabra clave 
                 counter+=1
+                ident = ([element][0]).get("id")
+                ids.append(ident)
         t1_stop = process_time() #tiempo final
+
         print("Tiempo de ejecución ",t1_stop-t1_start," segundos")
-    return counter
+        retdict = {"counter" : counter, "ids": ids}
+    return retdict
 
 def countElementsByCriteria(criteria, column, lst):
+    infomovie = []
+    mov = input("Ingrese la ubicación del archivo donde estan los metadatos de la película, \n por ejemplo: Data/themoviesdb/SmallMoviesDetailsCleaned.csv: ")
+    loadCSVFile(mov, infomovie)
+    
+    goodcnt = 0
+    cnt = 0
+
+    counter=countElementsFilteredByColumn(criteria, column, lst) #filtrar una columna por criterio  
+    for element in infomovie:
+        if ([element][0]).get("id") in counter.get("ids"):
+            if float(([element][0]).get("vote_average")) >= 6.0:
+                goodcnt += 1
+            cnt += float(([element][0]).get("vote_average"))
+    
+    avg = cnt/int(counter.get("counter"))
+    retdict = {"average":avg, "goodfilm": goodcnt,}
+    
     """
     Retorna la cantidad de elementos que cumplen con un criterio para una columna dada
     """
-    return 0
+    return retdict
 
 
 def main():
@@ -122,7 +146,8 @@ def main():
         inputs =input('Seleccione una opción para continuar\n') #leer opción ingresada
         if len(inputs)>0:
             if int(inputs[0])==1: #opcion 1
-                loadCSVFile("Data/test.csv", lista) #llamar funcion cargar datos
+                files= input("Ingrese el nombre y ubicación del archivo con el casting de la película, por defecto, Data/themoviesdb/MoviesCastingRaw-small.csv: \n")
+                loadCSVFile(files, lista) #llamar funcion cargar datos
                 print("Datos cargados, "+str(len(lista))+" elementos cargados")
             elif int(inputs[0])==2: #opcion 2
                 if len(lista)==0: #obtener la longitud de la lista
@@ -130,12 +155,15 @@ def main():
                 else: print("La lista tiene "+str(len(lista))+" elementos")
             elif int(inputs[0])==3: #opcion 3
                 criteria =input('Ingrese el criterio de búsqueda\n')
-                counter=countElementsFilteredByColumn(criteria, "nombre", lista) #filtrar una columna por criterio  
-                print("Coinciden ",counter," elementos con el crtierio: ", criteria  )
+                tipo_dato =input("Ingrese en que categoría quiere buscar, por ejemplo: director_name: \n")
+                counter=countElementsFilteredByColumn(criteria, tipo_dato, lista) #filtrar una columna por criterio  
+                print("Coinciden ",counter.get("counter")," elementos con el crtierio: ", criteria  )
+                print (counter.get("ids"))
             elif int(inputs[0])==4: #opcion 4
                 criteria =input('Ingrese el criterio de búsqueda\n')
-                counter=countElementsByCriteria(criteria,0,lista)
-                print("Coinciden ",counter," elementos con el crtierio: '", criteria ,"' (en construcción ...)")
+                tipo_dato =input("Ingrese en que categoría quiere buscar, por ejemplo: director_name: \n")
+                counter=countElementsByCriteria(criteria,tipo_dato,lista)
+                print("Coinciden ",counter.get("goodfilm")," elementos de 6.0 o más de calificación con el crtierio: '", criteria ,",con una calificación promedio de ", counter.get("average"))
             elif int(inputs[0])==0: #opcion 0, salir
                 sys.exit(0)
 
