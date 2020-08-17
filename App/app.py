@@ -122,7 +122,8 @@ def main():
         inputs =input('Seleccione una opción para continuar\n') #leer opción ingresada
         if len(inputs)>0:
             if int(inputs[0])==1: #opcion 1
-                loadCSVFile("Data/test.csv", lista) #llamar funcion cargar datos
+                files= input("Ingrese el nombre y ubicación del archivo que quiere cargar, por ejemplo, Data/themoviesdb/MoviesCastingRaw-small.csv: \n")
+                loadCSVFile(files, lista) #llamar funcion cargar datos
                 print("Datos cargados, "+str(len(lista))+" elementos cargados")
             elif int(inputs[0])==2: #opcion 2
                 if len(lista)==0: #obtener la longitud de la lista
