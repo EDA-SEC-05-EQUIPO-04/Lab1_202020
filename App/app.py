@@ -147,6 +147,7 @@ def main():
         if len(inputs)>0:
             if int(inputs[0])==1: #opcion 1
                 files= input("Ingrese el nombre y ubicación del archivo con el casting de la película, por defecto, Data/themoviesdb/MoviesCastingRaw-small.csv: \n")
+
                 loadCSVFile(files, lista) #llamar funcion cargar datos
                 print("Datos cargados, "+str(len(lista))+" elementos cargados")
             elif int(inputs[0])==2: #opcion 2
